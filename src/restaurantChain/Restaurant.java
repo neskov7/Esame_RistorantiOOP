@@ -1,5 +1,7 @@
 package restaurantChain;
 
+import java.io.ObjectOutputStream.PutField;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -11,6 +13,8 @@ public class Restaurant {
 	private int tables, busyTables = 0, refused = 0;
 	private Map<String, Menu> listing = new HashMap<>();
 	private Map<String, Integer> prenotations = new HashMap<String, Integer>();
+	private Map<String, String[]> orders = new HashMap<>(); 
+	private Map<String, Double> paid = new HashMap<String, Double>();
 
 	public Restaurant(String name, int tables) {
 		this.name = name;
@@ -37,7 +41,7 @@ public class Restaurant {
 			return 0;
 		}
 		busyTables += requiredTables;
-		prenotations.put(name, requiredTables);
+		prenotations.put(name, persons);
 		return requiredTables;
 	}
 
@@ -50,23 +54,49 @@ public class Restaurant {
 	}
 
 	public boolean order(String name, String... menu) throws InvalidName {
-		return false;
+		if (!prenotations.containsKey(name)) {	throw new InvalidName();	}
+		if (menu.length< prenotations.get(name)) return false;
+		for (String m : menu) {
+			if(!listing.containsKey(m)) throw new InvalidName();
+		}
+		orders.put(name, menu);
+		return true;
 	}
 
 	public List<String> getUnordered() {
-		return null;
+		
+		List<String> unordered = new ArrayList<String>();
+		prenotations.keySet().forEach(p -> {
+			if (!orders.containsKey(p)) {
+				unordered.add(p);
+			}
+		});
+		return unordered;
 	}
 
 	public double pay(String name) throws InvalidName {
-		return -1.0;
+		if (!prenotations.containsKey(name)) throw new InvalidName();
+		if (!orders.containsKey(name)) throw new InvalidName();
+		double toPay = 0;
+		for ( String m : orders.get(name)) {
+			toPay += listing.get(m).getPrice();
+		}
+		paid.put(name, toPay);
+		return toPay;
 	}
 
 	public List<String> getUnpaid() {
-		return null;
+		List<String> unpaid = new  ArrayList<String>();
+		orders.keySet().forEach( o -> {
+			if(!paid.containsKey(o)){
+				unpaid.add(o);
+			}
+		} );
+		return unpaid;
 	}
 
 	public double getIncome() {
-		return -1.0;
+		return paid.values().stream().reduce(0.0, (x,y) -> x+y );
 	}
 
 }
