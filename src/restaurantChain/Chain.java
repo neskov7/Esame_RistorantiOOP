@@ -24,7 +24,7 @@ public class Chain {
 	public List<Restaurant> sortByIncome() {
 		return 
 				chainRestaurant.values().stream()
-				.sorted(Comparator.comparing(Restaurant::getIncome))
+				.sorted(Comparator.comparing(Restaurant::getIncome).reversed())
 				.collect(Collectors.toList())
 				;
 	}

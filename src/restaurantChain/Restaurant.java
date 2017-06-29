@@ -1,6 +1,5 @@
 package restaurantChain;
 
-import java.io.ObjectOutputStream.PutField;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -35,9 +34,9 @@ public class Restaurant {
 	public int reserve(String name, int persons) throws InvalidName {
 		if (prenotations.containsKey(name))
 			throw new InvalidName();
-		int requiredTables = (int) Math.ceil(persons / 4);
+		int requiredTables = (int) Math.ceil((double) persons / 4);
 		if (tables - busyTables - requiredTables < 0) {
-			refused ++;
+			refused += persons;
 			return 0;
 		}
 		busyTables += requiredTables;
@@ -76,7 +75,7 @@ public class Restaurant {
 
 	public double pay(String name) throws InvalidName {
 		if (!prenotations.containsKey(name)) throw new InvalidName();
-		if (!orders.containsKey(name)) throw new InvalidName();
+		if (!orders.containsKey(name)) return 0;
 		double toPay = 0;
 		for ( String m : orders.get(name)) {
 			toPay += listing.get(m).getPrice();
